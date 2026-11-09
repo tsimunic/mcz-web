@@ -1,0 +1,53 @@
+@let p = product();
+@let d = display();
+<article class="card">
+  <a class="card__media" [routerLink]="['/proizvod', p.slug]" tabindex="-1" aria-hidden="true">
+    @if (p.images.length) {
+      <img class="card__img" [src]="p.images[0]" alt="" loading="lazy" width="500" height="500" />
+      @if (p.images[1]) {
+        <img class="card__img card__img--alt" [src]="p.images[1]" alt="" loading="lazy" width="500" height="500" />
+      }
+    } @else {
+      <span class="card__placeholder">MCZ</span>
+    }
+    @if (p.badge) {
+      <span class="card__badge">{{ p.badge }}</span>
+    }
+  </a>
+
+  <div class="card__body">
+    @if (p.brand) {
+      <p class="card__brand">{{ p.brand }}</p>
+    }
+    <h3 class="card__title">
+      <a [routerLink]="['/proizvod', p.slug]" [attr.title]="d.model !== p.name ? p.name : null">{{ d.model }}</a>
+    </h3>
+    @if (d.tags.length) {
+      <ul class="card__tags" role="list" aria-label="Oznake">
+        @for (t of d.tags; track t) {
+          <li>{{ t }}</li>
+        }
+      </ul>
+    }
+    <p [class]="'stock stock--' + p.availability">{{ labels[p.availability] }}</p>
+
+    <div class="card__foot">
+      <p class="card__price tnum">
+        {{ p.price | eur }}
+        @if (p.oldPrice) {
+          <s class="card__old">{{ p.oldPrice | eur }}</s>
+        }
+      </p>
+      @if (p.availability === 'in-stock') {
+        <button type="button" class="card__btn card__btn--add" (click)="add()" [attr.aria-label]="'Dodaj u košaricu: ' + p.name">
+          <app-icon name="cart" />
+          <span class="card__btn-text">Dodaj</span>
+        </button>
+      } @else {
+        <a class="card__btn card__btn--ask" [routerLink]="['/proizvod', p.slug]" [attr.aria-label]="'Pošalji upit: ' + p.name">
+          Upit
+        </a>
+      }
+    </div>
+  </div>
+</article>

@@ -1,0 +1,173 @@
+<div class="container page">
+  <nav class="crumbs" aria-label="Putanja">
+    <ol role="list">
+      <li><a routerLink="/kosarica">Košarica</a></li>
+      <li><span aria-current="page">Blagajna</span></li>
+    </ol>
+  </nav>
+  <h1 class="h-page title">Blagajna</h1>
+
+  @if (cart.isEmpty() && !submitting()) {
+    <div class="empty">
+      <h2 class="h-block">Nemate proizvoda za narudžbu</h2>
+      <p class="muted">Košarica je prazna. Dodajte proizvode iz trgovine pa se vratite ovdje.</p>
+      <a class="btn btn--primary btn--lg" routerLink="/trgovina">Otvori trgovinu</a>
+    </div>
+  } @else {
+    <form class="layout" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="steps">
+        <!-- 1. Kontakt -->
+        <fieldset class="step">
+          <legend class="step__head"><span class="step__num tnum" aria-hidden="true">1</span>Kontakt podaci</legend>
+          <div class="form-grid">
+            <div class="field">
+              <label for="co-fn">Ime <span class="req" aria-hidden="true">*</span></label>
+              <input id="co-fn" class="input" formControlName="firstName" autocomplete="given-name" [attr.aria-invalid]="invalid('firstName')" />
+              @if (invalid('firstName')) {
+                <p class="field-error">Upišite ime.</p>
+              }
+            </div>
+            <div class="field">
+              <label for="co-ln">Prezime <span class="req" aria-hidden="true">*</span></label>
+              <input id="co-ln" class="input" formControlName="lastName" autocomplete="family-name" [attr.aria-invalid]="invalid('lastName')" />
+              @if (invalid('lastName')) {
+                <p class="field-error">Upišite prezime.</p>
+              }
+            </div>
+            <div class="field">
+              <label for="co-em">E-mail <span class="req" aria-hidden="true">*</span></label>
+              <input id="co-em" class="input" type="email" formControlName="email" autocomplete="email" [attr.aria-invalid]="invalid('email')" />
+              @if (invalid('email')) {
+                <p class="field-error">Upišite ispravnu e-mail adresu. Na nju šaljemo potvrdu narudžbe.</p>
+              }
+            </div>
+            <div class="field">
+              <label for="co-ph">Telefon <span class="req" aria-hidden="true">*</span></label>
+              <input id="co-ph" class="input" type="tel" inputmode="tel" formControlName="phone" autocomplete="tel" [attr.aria-invalid]="invalid('phone')" />
+              @if (invalid('phone')) {
+                <p class="field-error">Upišite broj za dogovor oko preuzimanja.</p>
+              }
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 2. Dostava -->
+        <fieldset class="step">
+          <legend class="step__head"><span class="step__num tnum" aria-hidden="true">2</span>Dostava</legend>
+          <div class="options">
+            @for (s of shippingMethods; track s.id) {
+              <label class="option">
+                <input type="radio" formControlName="shipping" [value]="s.id" />
+                <span class="option__body">
+                  <span class="option__title">{{ s.label }}</span>
+                  <span class="option__desc">{{ s.description }}</span>
+                </span>
+                <span class="option__price tnum">{{ s.price === null ? 'Po dogovoru' : s.price === 0 ? 'Besplatno' : (s.price | eur) }}</span>
+              </label>
+            }
+          </div>
+
+          @if (shipping().requiresAddress) {
+            <div class="form-grid address">
+              <div class="field span-2">
+                <label for="co-st">Ulica i kućni broj <span class="req" aria-hidden="true">*</span></label>
+                <input id="co-st" class="input" formControlName="street" autocomplete="street-address" [attr.aria-invalid]="invalid('street')" />
+                @if (invalid('street')) {
+                  <p class="field-error">Upišite adresu za dostavu.</p>
+                }
+              </div>
+              <div class="field">
+                <label for="co-zip">Poštanski broj <span class="req" aria-hidden="true">*</span></label>
+                <input id="co-zip" class="input" formControlName="zip" inputmode="numeric" maxlength="5" autocomplete="postal-code" [attr.aria-invalid]="invalid('zip')" />
+                @if (invalid('zip')) {
+                  <p class="field-error">Poštanski broj ima 5 znamenki, npr. 49221.</p>
+                }
+              </div>
+              <div class="field">
+                <label for="co-city">Mjesto <span class="req" aria-hidden="true">*</span></label>
+                <input id="co-city" class="input" formControlName="city" autocomplete="address-level2" [attr.aria-invalid]="invalid('city')" />
+                @if (invalid('city')) {
+                  <p class="field-error">Upišite mjesto.</p>
+                }
+              </div>
+              <div class="field span-2">
+                <label for="co-country">Država</label>
+                <select id="co-country" class="select" formControlName="country" autocomplete="country-name">
+                  <option value="Hrvatska">Hrvatska</option>
+                  <option value="Slovenija">Slovenija</option>
+                  <option value="Bosna i Hercegovina">Bosna i Hercegovina</option>
+                </select>
+              </div>
+            </div>
+          }
+        </fieldset>
+
+        <!-- 3. Plaćanje -->
+        <fieldset class="step">
+          <legend class="step__head"><span class="step__num tnum" aria-hidden="true">3</span>Plaćanje</legend>
+          <div class="options">
+            @for (p of payments(); track p.id) {
+              <label class="option" [class.is-disabled]="p.disabled">
+                <input type="radio" formControlName="payment" [value]="p.id" [attr.disabled]="p.disabled ? '' : null" />
+                <span class="option__body">
+                  <span class="option__title">{{ p.label }}</span>
+                  <span class="option__desc">{{ p.description }}</span>
+                </span>
+              </label>
+            }
+          </div>
+        </fieldset>
+
+        <!-- 4. Napomena -->
+        <fieldset class="step">
+          <legend class="step__head"><span class="step__num tnum" aria-hidden="true">4</span>Napomena</legend>
+          <div class="field">
+            <label for="co-note">Napomena uz narudžbu (nije obavezno)</label>
+            <textarea id="co-note" class="textarea" formControlName="note" rows="3" placeholder="npr. model vozila za koji naručujete dio"></textarea>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- Sažetak -->
+      <aside class="summary" aria-label="Sažetak narudžbe">
+        <h2 class="summary__title">Vaša narudžba</h2>
+        <ul class="sum-lines" role="list">
+          @for (i of cart.items(); track i.productId) {
+            <li>
+              <span class="sum-img">
+                <img [src]="i.product.images[0]" alt="" width="56" height="56" />
+                <span class="sum-qty tnum">{{ i.qty }}</span>
+              </span>
+              <span class="sum-name">{{ i.product.name }}</span>
+              <span class="sum-price tnum">{{ i.lineTotal | eur }}</span>
+            </li>
+          }
+        </ul>
+        <dl>
+          <div><dt>Međuzbroj</dt><dd class="tnum">{{ cart.subtotal() | eur }}</dd></div>
+          <div>
+            <dt>Dostava</dt>
+            <dd>{{ shipping().price === null ? 'Po dogovoru' : shipping().price === 0 ? 'Besplatno' : (shipping().price | eur) }}</dd>
+          </div>
+          <div class="total"><dt>Ukupno</dt><dd class="tnum">{{ total() | eur }}</dd></div>
+        </dl>
+        @if (shipping().price === null) {
+          <p class="summary__note"><app-icon name="info" />Trošak dostave javljamo prije slanja i dodajemo ukupnom iznosu.</p>
+        }
+
+        <label class="check terms">
+          <input type="checkbox" formControlName="terms" />
+          <span>Pročitao/la sam i prihvaćam <a routerLink="/opci-uvjeti" target="_blank">opće uvjete poslovanja</a> i <a routerLink="/politika-privatnosti" target="_blank">politiku privatnosti</a>.</span>
+        </label>
+        @if (invalid('terms')) {
+          <p class="field-error">Za narudžbu morate prihvatiti uvjete.</p>
+        }
+
+        <button type="submit" class="btn btn--primary btn--lg btn--block" [disabled]="submitting()">
+          {{ submitting() ? 'Šaljem narudžbu…' : 'Naruči' }}
+        </button>
+        <a class="link back" routerLink="/kosarica"><app-icon name="chevron-left" />Natrag u košaricu</a>
+      </aside>
+    </form>
+  }
+</div>

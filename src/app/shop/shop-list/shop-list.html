@@ -1,0 +1,185 @@
+<app-page-hero [title]="heading()" [lead]="lead()" [crumbs]="crumbs()" />
+
+<ng-template #nodeTpl let-node>
+  <li>
+    <div class="tree__row">
+      <a class="tree__link" [routerLink]="['/trgovina', node.slug]" [class.is-active]="node.slug === kategorija()" [attr.aria-current]="node.slug === kategorija() ? 'page' : null">
+        <span>{{ node.name }}</span>
+        <span class="tree__count tnum">{{ node.count }}</span>
+      </a>
+      @if (node.children.length) {
+        <button
+          type="button"
+          class="tree__toggle"
+          [class.is-open]="isExpanded(node)"
+          (click)="toggle(node)"
+          [attr.aria-expanded]="isExpanded(node)"
+          [attr.aria-label]="(isExpanded(node) ? 'Sakrij potkategorije: ' : 'Prikaži potkategorije: ') + node.name"
+        >
+          <app-icon name="chevron-down" />
+        </button>
+      }
+    </div>
+    @if (node.children.length && isExpanded(node)) {
+      <ul role="list" class="tree__children">
+        @for (child of node.children; track child.slug) {
+          <ng-container *ngTemplateOutlet="nodeTpl; context: { $implicit: child }" />
+        }
+      </ul>
+    }
+  </li>
+</ng-template>
+
+<section class="shop">
+  <div class="container shop__grid">
+    <!-- ============ Filteri ============ -->
+    @if (filtersOpen()) {
+      <button type="button" class="scrim" aria-label="Zatvori filtere" (click)="filtersOpen.set(false)"></button>
+    }
+    <aside class="filters" [class.is-open]="filtersOpen()" aria-label="Filteri">
+      <div class="filters__head">
+        <p class="filters__title">Filteri</p>
+        <button type="button" class="filters__close" (click)="filtersOpen.set(false)" aria-label="Zatvori filtere"><app-icon name="close" /></button>
+      </div>
+
+      <nav class="block" aria-label="Kategorije">
+        <h2 class="block__title">Kategorije</h2>
+        <ul role="list" class="tree">
+          <li>
+            <div class="tree__row">
+              <a class="tree__link" routerLink="/trgovina" [class.is-active]="!kategorija()">
+                <span>Svi proizvodi</span>
+                <span class="tree__count tnum">{{ totalCount() }}</span>
+              </a>
+            </div>
+          </li>
+          @for (node of tree(); track node.slug) {
+            <ng-container *ngTemplateOutlet="nodeTpl; context: { $implicit: node }" />
+          }
+        </ul>
+      </nav>
+
+      <form class="block" (submit)="onPrice($event, minEl, maxEl)">
+        <h2 class="block__title">Cijena</h2>
+        <div class="price">
+          <div class="price__field">
+            <label for="f-min">Od €</label>
+            <input #minEl id="f-min" class="input" type="number" min="0" step="1" inputmode="numeric" [value]="min() ?? ''" />
+          </div>
+          <div class="price__field">
+            <label for="f-max">Do €</label>
+            <input #maxEl id="f-max" class="input" type="number" min="0" step="1" inputmode="numeric" [value]="max() ?? ''" />
+          </div>
+        </div>
+        <button type="submit" class="btn btn--outline btn--block">Primijeni cijenu</button>
+      </form>
+
+      <div class="block">
+        <h2 class="block__title">Dostupnost</h2>
+        <label class="check">
+          <input type="checkbox" [checked]="inStockOnly()" (change)="update({ zaliha: $any($event.target).checked ? '1' : null })" />
+          <span>Samo proizvodi na zalihi</span>
+        </label>
+      </div>
+    </aside>
+
+    <!-- ============ Rezultati ============ -->
+    <div class="results">
+      <div class="toolbar">
+        <form class="tsearch" role="search" (submit)="onSearch($event, sq)">
+          <app-icon name="search" />
+          <input
+            #sq
+            type="search"
+            [value]="q() ?? ''"
+            [placeholder]="category() ? 'Traži u kategoriji ' + category()!.name : 'Traži proizvode'"
+            aria-label="Traži proizvode"
+          />
+        </form>
+        <button type="button" class="btn btn--outline filters-btn" (click)="filtersOpen.set(true)">
+          <app-icon name="filter" />Filteri
+        </button>
+        <label class="sort">
+          <span>Poredaj</span>
+          <select class="select" (change)="update({ sort: $any($event.target).value === 'preporuceno' ? null : $any($event.target).value })">
+            @for (s of sorts; track s.key) {
+              <option [value]="s.key" [selected]="s.key === sortKey()">{{ s.label }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      <div class="meta">
+        <p class="meta__count tnum" aria-live="polite">{{ resultLabel() }}</p>
+        @if (activeFilters().length) {
+          <div class="active">
+            @for (f of activeFilters(); track f.label) {
+              <button type="button" class="afilter" (click)="update(f.clear)" [attr.aria-label]="'Ukloni filter ' + f.label">
+                {{ f.label }}<app-icon name="close" />
+              </button>
+            }
+            <button type="button" class="clear" (click)="clearAll()">Očisti sve</button>
+          </div>
+        }
+      </div>
+
+      @if (unknownCategory()) {
+        <div class="empty">
+          <h2 class="h-block">Ova kategorija ne postoji</h2>
+          <p class="muted">Možda je preimenovana. Odaberite kategoriju s popisa ili pogledajte sve proizvode.</p>
+          <a class="btn btn--dark" routerLink="/trgovina">Svi proizvodi</a>
+        </div>
+      } @else if (paged().length) {
+        <div class="product-grid">
+          @for (p of paged(); track p.id) {
+            <app-product-card [product]="p" />
+          }
+        </div>
+
+        @if (totalPages() > 1) {
+          <nav class="pager" aria-label="Stranice rezultata">
+            <a
+              class="pager__btn"
+              [class.is-disabled]="page() === 1"
+              [attr.aria-disabled]="page() === 1"
+              [routerLink]="[]"
+              [queryParams]="{ stranica: page() - 1 > 1 ? page() - 1 : null }"
+              queryParamsHandling="merge"
+              aria-label="Prethodna stranica"
+            ><app-icon name="chevron-left" /></a>
+            @for (n of pages(); track n) {
+              <a
+                class="pager__btn tnum"
+                [class.is-active]="n === page()"
+                [attr.aria-current]="n === page() ? 'page' : null"
+                [routerLink]="[]"
+                [queryParams]="{ stranica: n > 1 ? n : null }"
+                queryParamsHandling="merge"
+              >{{ n }}</a>
+            }
+            <a
+              class="pager__btn"
+              [class.is-disabled]="page() === totalPages()"
+              [attr.aria-disabled]="page() === totalPages()"
+              [routerLink]="[]"
+              [queryParams]="{ stranica: page() < totalPages() ? page() + 1 : totalPages() }"
+              queryParamsHandling="merge"
+              aria-label="Sljedeća stranica"
+            ><app-icon name="chevron-right" /></a>
+          </nav>
+        }
+      } @else {
+        <div class="empty">
+          <h2 class="h-block">Nema proizvoda za odabrane filtere</h2>
+          <p class="muted">Pokušajte s drugim pojmom ili uklonite neki od filtera. Ako tražite određeni dio, pošaljite upit i provjerit ćemo dostupnost.</p>
+          <div class="empty__actions">
+            @if (activeFilters().length) {
+              <button type="button" class="btn btn--dark" (click)="clearAll()">Očisti filtere</button>
+            }
+            <a class="btn btn--outline" routerLink="/kontakt">Pošalji upit</a>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>

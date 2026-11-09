@@ -10,6 +10,25 @@ npm start          # http://localhost:4200
 npm run build      # produkcijski build u dist/
 ```
 
+## Demo za klijenta – GitHub Pages
+
+Adresa: **https://tsimunic.github.io/mcz-web/**
+
+Jednokratno: na GitHubu u repozitoriju **Settings → Pages → Build and deployment → Source:
+"GitHub Actions"**. Nakon toga svaki `git push` na `main` sam napravi build i objavi stranicu
+(`.github/workflows/deploy-pages.yml`, traje 2–4 minute; napredak je u kartici **Actions**).
+
+`npm run build:demo` radi isto lokalno:
+
+- gradi za podadresu `/mcz-web/` (konfiguracija `demo` u `angular.json`);
+- koristi `src/environments/environment.demo.ts`: pregled linka pokazuje na demo adresu, a sve
+  stranice imaju `noindex`, da se demo ne pojavi u Googleu umjesto prave stranice;
+- napravi `404.html` (`scripts/github-pages.mjs`), da izravni link na košaricu, blagajnu ili
+  potvrdu narudžbe radi i na GitHub Pagesu.
+
+Za klijenta: obrasci (kontakt, servis, narudžba) još ništa ne šalju, pravne stranice čekaju
+tekst, a slike se učitavaju sa stare stranice.
+
 ## Objava (statički hosting)
 
 `npm run build` unaprijed generira HTML za naslovnicu, trgovinu, sve kategorije, sve proizvode,

@@ -1,0 +1,57 @@
+<div class="container page">
+  <h1 class="h-page title">Košarica</h1>
+
+  @if (cart.isEmpty()) {
+    <div class="empty">
+      <app-icon name="cart" />
+      <h2 class="h-block">Košarica je prazna</h2>
+      <p class="muted">Dodajte vozila, dijelove ili opremu iz trgovine i ovdje ćete vidjeti pregled prije narudžbe.</p>
+      <div class="empty__actions">
+        <a class="btn btn--primary btn--lg" routerLink="/trgovina">Otvori trgovinu</a>
+        <a class="btn btn--outline btn--lg" routerLink="/trgovina/service-kit">Servis kitovi</a>
+      </div>
+    </div>
+  } @else {
+    <div class="layout">
+      <section aria-label="Proizvodi u košarici">
+        <ul class="lines" role="list">
+          @for (item of cart.items(); track item.productId) {
+            <li class="line">
+              <a class="line__img" [routerLink]="['/proizvod', item.product.slug]" tabindex="-1" aria-hidden="true">
+                <img [src]="item.product.images[0]" alt="" width="120" height="120" />
+              </a>
+              <div class="line__info">
+                @if (item.product.brand) {
+                  <p class="line__brand">{{ item.product.brand }}</p>
+                }
+                <h2 class="line__name"><a [routerLink]="['/proizvod', item.product.slug]">{{ item.product.name }}</a></h2>
+                <p class="line__unit tnum">{{ item.product.price | eur }} / kom</p>
+              </div>
+              <div class="qty" role="group" [attr.aria-label]="'Količina: ' + item.product.name">
+                <button type="button" (click)="cart.setQty(item.productId, item.qty - 1)" aria-label="Smanji količinu"><app-icon name="minus" /></button>
+                <input type="number" min="1" max="99" inputmode="numeric" class="tnum" [value]="item.qty" (change)="setQty(item.productId, $any($event.target).value)" aria-label="Količina" />
+                <button type="button" (click)="cart.setQty(item.productId, item.qty + 1)" aria-label="Povećaj količinu"><app-icon name="plus" /></button>
+              </div>
+              <p class="line__total tnum">{{ item.lineTotal | eur }}</p>
+              <button type="button" class="line__remove" (click)="cart.remove(item.productId)" [attr.aria-label]="'Ukloni iz košarice: ' + item.product.name">
+                <app-icon name="trash" />
+              </button>
+            </li>
+          }
+        </ul>
+        <a class="link back" routerLink="/trgovina"><app-icon name="chevron-left" />Nastavi kupovinu</a>
+      </section>
+
+      <aside class="summary" aria-label="Sažetak narudžbe">
+        <h2 class="summary__title">Sažetak</h2>
+        <dl>
+          <div><dt>Međuzbroj ({{ cart.count() }} kom)</dt><dd class="tnum">{{ cart.subtotal() | eur }}</dd></div>
+          <div><dt>Dostava</dt><dd class="muted">Odabire se na blagajni</dd></div>
+          <div class="total"><dt>Ukupno</dt><dd class="tnum">{{ cart.subtotal() | eur }}</dd></div>
+        </dl>
+        <a class="btn btn--primary btn--lg btn--block" routerLink="/blagajna">Nastavi na blagajnu</a>
+        <p class="summary__note">Osobno preuzimanje u Bedekovčini je besplatno.</p>
+      </aside>
+    </div>
+  }
+</div>

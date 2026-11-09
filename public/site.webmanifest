@@ -1,0 +1,16 @@
+{
+  "name": "Moto Centar Zagorje",
+  "short_name": "MCZ",
+  "description": "ATV i UTV vozila, motocikli, dijelovi i servis u Bedekovčini.",
+  "lang": "hr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f2f0ec",
+  "theme_color": "#16120f",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

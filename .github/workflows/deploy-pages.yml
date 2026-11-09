@@ -1,0 +1,49 @@
+# Demo za klijenta: https://tsimunic.github.io/mcz-web/
+# Pokreće se na svaki push na main (ili ručno: Actions → "Objava na GitHub Pages" → Run workflow).
+# Jednokratno u repozitoriju: Settings → Pages → Build and deployment → Source: "GitHub Actions".
+name: Objava na GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Samo jedna objava u isto vrijeme; novi push prekida stariju objavu u tijeku
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22 # LTS; Angular 21 traži ^20.19 || ^22.12 || >=24
+          cache: npm
+
+      - run: npm ci
+
+      # Build za podadresu /mcz-web/ + 404.html (vidi scripts/github-pages.mjs)
+      - run: npm run build:demo
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/moto-centar-zagorje/browser
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

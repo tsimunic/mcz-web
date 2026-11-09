@@ -1,0 +1,63 @@
+<footer class="footer on-dark">
+  <app-contours [hills]="hills" />
+
+  <div class="container">
+    <div class="social-band">
+      <p class="social-band__title">Pratite nas i budite u korak s novostima</p>
+      <div class="social-band__links">
+        <a [href]="site.social.instagram" target="_blank" rel="noopener" class="social">
+          <app-icon name="instagram" /><span><b>Instagram</b>&#64;motocentarzagorje</span>
+        </a>
+        <a [href]="site.social.youtube" target="_blank" rel="noopener" class="social">
+          <app-icon name="youtube" /><span><b>YouTube</b>Podcast Pod gasom</span>
+        </a>
+        <a [href]="site.social.facebook" target="_blank" rel="noopener" class="social">
+          <app-icon name="facebook" /><span><b>Facebook</b>motocentarzagorje</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="col col--brand">
+        <a routerLink="/" class="brand">
+          <span class="brand__mark"><img [src]="site.logo" alt="" width="64" height="64" loading="lazy" /></span>
+          <span class="brand__name">Moto Centar<br />Zagorje</span>
+        </a>
+        <address>
+          <a [href]="site.mapsLink" target="_blank" rel="noopener" class="row"><app-icon name="pin" />{{ site.street }}, {{ site.city }}</a>
+          <a [href]="site.phoneHref" class="row"><app-icon name="phone" />{{ site.phone }}</a>
+          <a [href]="'mailto:' + site.email" class="row"><app-icon name="mail" />{{ site.email }}</a>
+        </address>
+      </div>
+
+      <div class="col col--hours">
+        <h2 class="col__title">Radno vrijeme</h2>
+        <app-hours />
+      </div>
+
+      <nav class="col" aria-label="Trgovina">
+        <h2 class="col__title">Trgovina</h2>
+        <ul role="list">
+          @for (l of shopLinks; track l.slug) {
+            <li><a [routerLink]="['/trgovina', l.slug]">{{ l.label }}</a></li>
+          }
+        </ul>
+      </nav>
+
+      <nav class="col" aria-label="Informacije">
+        <h2 class="col__title">Informacije</h2>
+        <ul role="list">
+          <li><a routerLink="/servis">Servis</a></li>
+          <li><a routerLink="/kontakt">Kontakt</a></li>
+          <li><a routerLink="/politika-privatnosti">Politika privatnosti</a></li>
+          <li><a routerLink="/opci-uvjeti">Opći uvjeti poslovanja</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="base">
+      <p>© {{ year }} Moto Centar Zagorje. Sva prava pridržana.</p>
+      <p>Cijene su izražene u eurima.</p>
+    </div>
+  </div>
+</footer>

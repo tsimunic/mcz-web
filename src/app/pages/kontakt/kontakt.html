@@ -1,0 +1,66 @@
+<app-page-hero
+  title="Kontakt"
+  lead="Nazovite, pišite ili svratite u Bedekovčinu. Na upite odgovaramo u radno vrijeme."
+  [crumbs]="[{ label: 'Kontakt' }]"
+/>
+
+<section class="section">
+  <div class="container">
+    <ul class="methods" role="list">
+      <li>
+        <a class="method" [href]="site.phoneHref">
+          <app-icon name="phone" />
+          <span class="method__label">Telefon</span>
+          <span class="method__value tnum">{{ site.phone }}</span>
+        </a>
+      </li>
+      <li>
+        <a class="method" [href]="'mailto:' + site.email">
+          <app-icon name="mail" />
+          <span class="method__label">E-mail</span>
+          <span class="method__value">{{ site.email }}</span>
+        </a>
+      </li>
+      <li>
+        <a class="method" [href]="site.mapsLink" target="_blank" rel="noopener">
+          <app-icon name="pin" />
+          <span class="method__label">Adresa</span>
+          <span class="method__value">{{ site.street }}, {{ site.city }}</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="grid">
+      <div class="form-card">
+        <h2 class="h-block">{{ upit() ? 'Upit za proizvod' : 'Pošaljite poruku' }}</h2>
+        @if (upit()) {
+          <p class="muted product-note">{{ upit() }}</p>
+        }
+        <app-contact-form [prefill]="prefill()" [topic]="topic()" [submitLabel]="upit() ? 'Pošalji upit' : 'Pošalji poruku'" />
+      </div>
+
+      <div class="side">
+        <div class="hours-card">
+          <h2 class="side__title">Radno vrijeme</h2>
+          <app-hours />
+        </div>
+
+        <div class="map">
+          @if (mapLoaded()) {
+            <iframe [src]="mapUrl" title="Karta: Moto Centar Zagorje, Bedekovčina" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          } @else {
+            <div class="map__placeholder">
+              <app-icon name="pin" />
+              <p>{{ site.street }}<br />{{ site.city }}</p>
+              <div class="map__actions">
+                <button type="button" class="btn btn--dark" (click)="mapLoaded.set(true)">Prikaži kartu</button>
+                <a class="link" [href]="site.mapsLink" target="_blank" rel="noopener">Otvori u Google Maps</a>
+              </div>
+              <p class="map__note">Karta se učitava s Google Maps tek kad je otvorite.</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,265 @@
+.page {
+  padding-block: clamp(2rem, 5vw, 3.5rem) var(--section);
+}
+
+.title {
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  align-items: start;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lines {
+  display: grid;
+  border-top: 2px solid var(--c-ink);
+}
+
+.line {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) auto 120px auto;
+  align-items: center;
+  gap: 1.25rem;
+  padding-block: 1.25rem;
+  border-bottom: 1px solid var(--c-line);
+}
+
+.line__img {
+  display: block;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: var(--r-md);
+  background: var(--c-stone);
+}
+
+.line__img img {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.line__brand {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-ink-3);
+}
+
+.line__name {
+  font-size: var(--fs-base);
+  font-weight: 650;
+  line-height: 1.3;
+  a {
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.line__unit {
+  margin-top: 0.2rem;
+  font-size: var(--fs-sm);
+  color: var(--c-ink-3);
+}
+
+.line__total {
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  font-stretch: 78%;
+  text-align: right;
+}
+
+.line__remove {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--c-ink-3);
+  app-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+  &:hover {
+    background: #fbe7e0;
+    color: var(--c-orange-dark);
+  }
+}
+
+.qty {
+  display: flex;
+  height: 2.75rem;
+  border: 1.5px solid var(--c-line);
+  border-radius: var(--r-sm);
+  background: var(--c-paper);
+  overflow: hidden;
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    border: 0;
+    background: transparent;
+    &:hover {
+      background: var(--c-sand);
+    }
+    app-icon {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+  input {
+    width: 2.75rem;
+    border: 0;
+    border-inline: 1px solid var(--c-line);
+    text-align: center;
+    font-weight: 700;
+    -moz-appearance: textfield;
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+    }
+  }
+}
+
+.back {
+  margin-top: 1.5rem;
+  app-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .line {
+    grid-template-columns: 72px minmax(0, 1fr) auto;
+    grid-template-areas:
+      'img info remove'
+      'img qty total';
+    gap: 0.6rem 1rem;
+  }
+  .line__img {
+    grid-area: img;
+    align-self: start;
+    img {
+      width: 72px;
+      height: 72px;
+    }
+  }
+  .line__info {
+    grid-area: info;
+  }
+  .qty {
+    grid-area: qty;
+    justify-self: start;
+  }
+  .line__total {
+    grid-area: total;
+  }
+  .line__remove {
+    grid-area: remove;
+    align-self: start;
+  }
+}
+
+/* ---------- Sažetak ---------- */
+.summary {
+  position: sticky;
+  top: calc(var(--header-h) + 1rem);
+  display: grid;
+  gap: 1.25rem;
+  padding: 1.75rem;
+  border-radius: var(--r-lg);
+  background: var(--c-paper);
+
+  /* Mobitel: bijeli list od ruba do ruba, sadržaj poravnat s ostatkom stranice */
+  @media (max-width: 600px) {
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    border-radius: 0;
+  }
+
+  dl {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0;
+    div {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    dd {
+      margin: 0;
+      font-weight: 600;
+      text-align: right;
+    }
+  }
+  .total {
+    margin-top: 0.4rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--c-line);
+    dt {
+      font-weight: 700;
+    }
+    dd {
+      font-size: 1.75rem;
+      font-weight: 800;
+      font-stretch: 75%;
+      line-height: 1;
+    }
+  }
+}
+
+.summary__title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  font-stretch: 62%;
+  text-transform: uppercase;
+}
+
+.summary__note {
+  font-size: var(--fs-xs);
+  color: var(--c-ink-3);
+  text-align: center;
+}
+
+/* ---------- Prazno ---------- */
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: clamp(2.5rem, 7vw, 5rem) 1.5rem;
+  border-radius: var(--r-lg);
+  background: var(--c-paper);
+  text-align: center;
+
+  > app-icon {
+    width: 3rem;
+    height: 3rem;
+    color: var(--c-ink-3);
+    --icon-stroke: 1.4;
+  }
+  p {
+    max-width: 48ch;
+  }
+}
+
+.empty__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}

@@ -1,0 +1,137 @@
+<app-page-hero
+  title="Servis"
+  lead="Servisiramo ATV, UTV vozila i motocikle u Bedekovčini. Dogovorite termin telefonom ili putem obrasca, a dijelove za održavanje možete naručiti i sami."
+  [image]="heroImage"
+  [crumbs]="[{ label: 'Servis' }]"
+>
+  <div class="hero-actions">
+    <a class="btn btn--primary btn--lg" routerLink="/servis" fragment="termin">Dogovori termin</a>
+    <a class="btn btn--ghost btn--lg" [href]="site.phoneHref"><app-icon name="phone" />{{ site.phone }}</a>
+  </div>
+</app-page-hero>
+
+<section class="section">
+  <div class="container">
+    <h2 class="h-section title">Što radimo</h2>
+    <ul class="services" role="list">
+      @for (s of services; track s.title) {
+        <li class="service">
+          <app-icon [name]="s.icon" />
+          <h3 class="service__title">{{ s.title }}</h3>
+          <p class="service__text">{{ s.text }}</p>
+        </li>
+      }
+    </ul>
+
+    <aside class="kit">
+      <div>
+        <h3 class="h-block">Sam svoj majstor?</h3>
+        <p class="muted">Servis kitovi sadrže sve potrošne dijelove za redovni servis vašeg modela, u jednom paketu.</p>
+      </div>
+      <a class="btn btn--dark btn--lg" routerLink="/trgovina/service-kit">Pogledaj servis kitove</a>
+    </aside>
+  </div>
+</section>
+
+<section class="section steps-section">
+  <div class="container">
+    <h2 class="h-section title">Kako do servisa</h2>
+    <ol class="steps" role="list">
+      @for (s of steps; track s.title; let i = $index) {
+        <li class="step">
+          <span class="step__num tnum" aria-hidden="true">{{ i + 1 }}</span>
+          <h3 class="step__title">{{ s.title }}</h3>
+          <p class="step__text">{{ s.text }}</p>
+        </li>
+      }
+    </ol>
+  </div>
+</section>
+
+<section class="section booking" id="termin">
+  <div class="container booking__grid">
+    <div class="booking__form">
+      <h2 class="h-section title">Dogovori termin</h2>
+      <p class="lead">Ispunite obrazac i javit ćemo vam se s prijedlogom termina.</p>
+
+      @if (sent()) {
+        <div class="notice" role="status">
+          <app-icon name="check" />
+          <div>
+            <p>Zahtjev za servis je poslan.</p>
+            <p class="sub">Javit ćemo vam se telefonom s prijedlogom termina.</p>
+          </div>
+        </div>
+        <button type="button" class="btn btn--outline again" (click)="reset()">Pošalji novi zahtjev</button>
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form-grid">
+          <div class="field">
+            <label for="sv-name">Ime i prezime <span class="req" aria-hidden="true">*</span></label>
+            <input id="sv-name" class="input" formControlName="name" autocomplete="name" [attr.aria-invalid]="invalid('name')" />
+            @if (invalid('name')) {
+              <p class="field-error">Upišite ime i prezime.</p>
+            }
+          </div>
+          <div class="field">
+            <label for="sv-phone">Kontakt broj <span class="req" aria-hidden="true">*</span></label>
+            <input id="sv-phone" class="input" type="tel" inputmode="tel" formControlName="phone" autocomplete="tel" [attr.aria-invalid]="invalid('phone')" />
+            @if (invalid('phone')) {
+              <p class="field-error">Upišite broj na koji vas možemo nazvati.</p>
+            }
+          </div>
+          <div class="field">
+            <label for="sv-email">E-mail</label>
+            <input id="sv-email" class="input" type="email" formControlName="email" autocomplete="email" [attr.aria-invalid]="invalid('email')" />
+            @if (invalid('email')) {
+              <p class="field-error">Provjerite e-mail adresu.</p>
+            }
+          </div>
+          <div class="field">
+            <label for="sv-vehicle">Vozilo (marka i model) <span class="req" aria-hidden="true">*</span></label>
+            <input id="sv-vehicle" class="input" formControlName="vehicle" placeholder="npr. Linhai 550 L" [attr.aria-invalid]="invalid('vehicle')" />
+            @if (invalid('vehicle')) {
+              <p class="field-error">Upišite marku i model vozila.</p>
+            }
+          </div>
+          <div class="field">
+            <label for="sv-type">Vrsta servisa</label>
+            <select id="sv-type" class="select" formControlName="type">
+              @for (t of serviceTypes; track t) {
+                <option [value]="t">{{ t }}</option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label for="sv-date">Željeni datum</label>
+            <input id="sv-date" class="input" type="date" formControlName="date" />
+          </div>
+          <div class="field span-2">
+            <label for="sv-msg">Opis problema ili napomena</label>
+            <textarea id="sv-msg" class="textarea" formControlName="message" rows="4"></textarea>
+          </div>
+          <div class="span-2">
+            <label class="check">
+              <input type="checkbox" formControlName="consent" />
+              <span>Pristajem na obradu podataka radi dogovora servisa, prema <a routerLink="/politika-privatnosti">politici privatnosti</a>.</span>
+            </label>
+            @if (invalid('consent')) {
+              <p class="field-error">Za slanje zahtjeva potrebna je vaša privola.</p>
+            }
+          </div>
+          <div class="span-2">
+            <button type="submit" class="btn btn--primary btn--lg" [disabled]="sending()">
+              {{ sending() ? 'Šaljem…' : 'Pošalji zahtjev za servis' }}
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+
+    <aside class="booking__side on-dark">
+      <h3 class="side__title">Radije nazovite?</h3>
+      <a class="side__phone tnum" [href]="site.phoneHref">{{ site.phone }}</a>
+      <p class="side__addr"><app-icon name="pin" />{{ site.street }}, {{ site.city }}</p>
+      <app-hours />
+    </aside>
+  </div>
+</section>

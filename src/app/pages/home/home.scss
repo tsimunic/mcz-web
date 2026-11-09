@@ -1,0 +1,814 @@
+/* =========================================================
+   HERO
+   ========================================================= */
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-items: end;
+  min-height: min(calc(100svh - var(--header-h) - 2.4rem), 860px);
+  overflow: hidden;
+  background: var(--c-coal);
+}
+
+.hero__img {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.9s var(--ease);
+
+  &.is-active {
+    opacity: 1;
+  }
+}
+
+/* Spori "Ken Burns" zoom – fotografija diše, ali ne odvlači pažnju od naslova.
+   Animacija teče na svim slikama, pa pri promjeni slajda nema skoka u mjerilu. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero__img {
+    animation: drift 24s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+.hero__shade {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    linear-gradient(0deg, rgba(22, 18, 15, 0.92) 0%, rgba(22, 18, 15, 0.25) 42%, rgba(22, 18, 15, 0) 65%),
+    linear-gradient(90deg, rgba(22, 18, 15, 0.9) 0%, rgba(22, 18, 15, 0.62) 36%, rgba(22, 18, 15, 0.05) 72%);
+}
+
+.hero__contours {
+  z-index: -1;
+  --contour-opacity: 0.16;
+  mask-image: linear-gradient(90deg, #000 0%, #000 30%, transparent 68%);
+}
+
+.hero__inner {
+  position: relative;
+  display: grid;
+  gap: clamp(2rem, 5vw, 3.5rem);
+  padding-block: clamp(6rem, 14vw, 9rem) 1.5rem;
+}
+
+.hero__content {
+  max-width: 1100px;
+}
+
+/* Jedini orkestrirani trenutak na stranici: naslov se "izvlači" iz terena.
+   Kurziv samo ovdje – osjećaj brzine; pravi Archivo italic (učitan u index.html), ne lažni nagib. */
+.hero__title {
+  font-size: var(--fs-hero);
+  font-style: italic;
+  padding-right: 0.06em; /* nagnuto zadnje slovo ne smije biti odrezano */
+  text-wrap: balance;
+  animation: rise 0.8s var(--ease) both;
+}
+
+.hero__text {
+  max-width: 46ch;
+  margin-top: clamp(1rem, 2vw, 1.5rem);
+  font-size: var(--fs-md);
+  line-height: 1.55;
+  color: #e2dcd2;
+  animation: rise 0.8s 0.12s var(--ease) both;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 2rem;
+  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+  animation: rise 0.8s 0.22s var(--ease) both;
+}
+
+.hero__price {
+  display: grid;
+  line-height: 1.1;
+
+  span {
+    font-size: var(--fs-xs);
+    color: var(--c-mist);
+    font-weight: 600;
+  }
+  b {
+    font-size: 1.75rem;
+    font-weight: 800;
+    font-stretch: 75%;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.6em);
+  }
+}
+
+.hero__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.hero__tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.45rem 1rem 0.45rem 0.45rem;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--c-mist);
+  font-weight: 650;
+  font-size: var(--fs-sm);
+  transition: background-color 0.15s, color 0.15s;
+
+  img {
+    width: 72px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: 2px;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(-1rem - 1px);
+    height: 3px;
+    background: var(--c-orange);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s var(--ease);
+  }
+
+  &:hover {
+    color: #fff;
+    img {
+      opacity: 1;
+    }
+  }
+
+  &[aria-selected='true'] {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+    img {
+      opacity: 1;
+    }
+    &::before {
+      transform: scaleX(1);
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    min-height: 600px;
+  }
+  .hero__shade {
+    background: linear-gradient(0deg, rgba(22, 18, 15, 0.96) 0%, rgba(22, 18, 15, 0.7) 50%, rgba(22, 18, 15, 0.15) 100%);
+  }
+  /* Na mobitelu kartice postaju segmentirani prekidač: bez sličica, naziv u jednom redu */
+  .hero__tab {
+    flex: 1 1 0;
+    min-width: 0;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    text-align: center;
+    img {
+      display: none;
+    }
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+/* Gumb pune širine – lakše ga je pogoditi palcem, a cijena stoji odmah ispod */
+@media (max-width: 480px) {
+  .hero__actions {
+    gap: 1rem;
+    .btn {
+      flex: 1 1 100%;
+    }
+  }
+}
+
+/* =========================================================
+   PREDNOSTI
+   ========================================================= */
+.perks {
+  background: var(--c-paper);
+  border-bottom: 1px solid var(--c-line);
+}
+
+.perks__list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1.5rem 1.25rem;
+    & + li {
+      border-left: 1px solid var(--c-line);
+    }
+    &:first-child {
+      padding-left: 0;
+    }
+  }
+
+  app-icon {
+    width: 2rem;
+    height: 2rem;
+    color: var(--c-ink);
+    --icon-stroke: 1.5;
+  }
+
+  span {
+    display: grid;
+    font-size: var(--fs-sm);
+    line-height: 1.4;
+    color: var(--c-ink-2);
+  }
+
+  b {
+    font-size: var(--fs-base);
+    color: var(--c-ink);
+    font-weight: 700;
+  }
+}
+
+@media (max-width: 1000px) {
+  .perks__list {
+    grid-template-columns: repeat(2, 1fr);
+    li:nth-child(3) {
+      border-left: 0;
+      padding-left: 0;
+    }
+    li:nth-child(n + 3) {
+      border-top: 1px solid var(--c-line);
+    }
+  }
+}
+
+@media (max-width: 560px) {
+  .perks__list {
+    grid-template-columns: 1fr;
+    li {
+      padding: 1rem 0;
+      & + li {
+        border-left: 0;
+        border-top: 1px solid var(--c-line);
+      }
+    }
+  }
+}
+
+/* =========================================================
+   ZAGLAVLJA SEKCIJA
+   ========================================================= */
+.head {
+  display: grid;
+  gap: 1.25rem;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+  max-width: 760px;
+}
+
+.head--row {
+  max-width: none;
+  grid-template-columns: auto 1fr;
+  align-items: end;
+  gap: 1.25rem 3rem;
+
+  > :last-child {
+    justify-self: end;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+    > :last-child {
+      justify-self: stretch;
+      min-width: 0;
+    }
+  }
+}
+
+/* =========================================================
+   PONUDA – pločice
+   ========================================================= */
+.tiles {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  grid-template-rows: repeat(2, minmax(260px, 1fr));
+  gap: 0.75rem;
+  min-height: 620px;
+}
+
+.tile {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--c-coal);
+  color: #fff;
+
+  img {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s var(--ease);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(0deg, rgba(22, 18, 15, 0.9) 0%, rgba(22, 18, 15, 0.35) 45%, rgba(22, 18, 15, 0) 75%);
+  }
+
+  &:hover img {
+    transform: scale(1.04);
+  }
+
+  &:has(.tile__link:focus-visible) {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+}
+
+.tile--big {
+  grid-row: span 2;
+}
+
+.tile__body {
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+.tile__title {
+  font-size: clamp(2.25rem, 4vw, 3.5rem);
+  font-weight: 800;
+  font-stretch: 62%;
+  text-transform: uppercase;
+  line-height: 0.9;
+
+  .tile--big & {
+    font-size: clamp(3rem, 6.5vw, 6rem);
+  }
+}
+
+.tile__link {
+  color: inherit;
+  text-decoration: none;
+  outline: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+}
+
+.tile__text {
+  margin-top: 0.5rem;
+  color: #e2dcd2;
+}
+
+.tile__brands {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.1rem;
+
+  a {
+    display: inline-block;
+    padding: 0.4rem 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 999px;
+    font-size: var(--fs-sm);
+    font-weight: 650;
+    text-decoration: none;
+    color: #fff;
+    backdrop-filter: blur(4px);
+    transition: background-color 0.15s, color 0.15s;
+    &:hover {
+      background: #fff;
+      color: var(--c-ink);
+    }
+  }
+}
+
+@media (max-width: 760px) {
+  .tiles {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    min-height: 0;
+  }
+  .tile {
+    min-height: 260px;
+  }
+  .tile--big {
+    grid-row: auto;
+    min-height: 380px;
+  }
+}
+
+/* =========================================================
+   IZDVOJENO
+   ========================================================= */
+.featured {
+  padding-top: 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+
+  /* Mobitel: jedan red koji se pomiče prstom i ide do ruba ekrana (zadnji čip "viri" = ima još) */
+  @media (max-width: 600px) {
+    flex-wrap: nowrap;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    overflow-x: auto;
+    scroll-padding-inline: var(--gutter);
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    .chip {
+      flex: none;
+      scroll-snap-align: start;
+    }
+  }
+}
+
+.chip {
+  padding: 0.5rem 1rem;
+  border: 1.5px solid var(--c-line);
+  border-radius: 999px;
+  background: var(--c-paper);
+  font-size: var(--fs-sm);
+  font-weight: 650;
+  color: var(--c-ink-2);
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+
+  &:hover {
+    border-color: var(--c-ink);
+    color: var(--c-ink);
+  }
+
+  &[aria-pressed='true'] {
+    background: var(--c-ink);
+    border-color: var(--c-ink);
+    color: #fff;
+  }
+
+  @media (pointer: coarse) {
+    min-height: 2.75rem;
+  }
+}
+
+.featured__more {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(2rem, 4vw, 3rem);
+
+  @media (max-width: 480px) {
+    .btn {
+      flex: 1;
+    }
+  }
+}
+
+/* =========================================================
+   SERVIS TRAKA
+   ========================================================= */
+.band {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-block: var(--section);
+  --contour-opacity: 0.11;
+
+  app-contours {
+    z-index: -1;
+  }
+}
+
+.band__inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2.5rem, 6vw, 6rem);
+  align-items: center;
+}
+
+.band__intro {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.band__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+
+  /* Gumbi jedan ispod drugog moraju biti iste širine */
+  @media (max-width: 480px) {
+    .btn {
+      flex: 1 1 100%;
+    }
+  }
+}
+
+.steps {
+  display: grid;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 3.25rem 1fr;
+  gap: 1rem;
+  padding-block: 1.35rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+
+  &:last-child {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  }
+}
+
+.step__num {
+  font-size: 3rem;
+  font-weight: 800;
+  font-stretch: 62%;
+  line-height: 0.85;
+  color: var(--c-grey);
+}
+
+.step__title {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  font-stretch: 85%;
+  line-height: 1.2;
+}
+
+.step__text {
+  margin-top: 0.25rem;
+  color: var(--c-mist);
+}
+
+@media (max-width: 900px) {
+  .band__inner {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   BRENDOVI
+   ========================================================= */
+.brand-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border-block: 1px solid var(--c-line);
+
+  li + li {
+    border-left: 1px solid var(--c-line);
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(6, 1fr);
+    li {
+      grid-column: span 2;
+    }
+    li:nth-child(n + 4) {
+      grid-column: span 3;
+      border-top: 1px solid var(--c-line);
+    }
+    li + li:nth-child(4) {
+      border-left: 0;
+    }
+  }
+}
+
+/* Logotipi su jednobojni (silueta), u boji tek na hover – pet različitih logotipa ne svađa se s brandom */
+.brand-tile {
+  display: grid;
+  gap: 0.5rem;
+  height: 100%;
+  padding: clamp(1rem, 2.5vw, 1.75rem) clamp(0.75rem, 2vw, 1.5rem) 1.1rem;
+  color: var(--c-ink);
+  text-decoration: none;
+  transition: background-color 0.25s var(--ease);
+
+  &:hover {
+    background: var(--c-paper);
+  }
+}
+
+.brand-tile__mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  max-width: 11rem;
+  margin-inline: auto;
+  aspect-ratio: 5 / 3;
+  overflow: hidden;
+
+  img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0);
+    opacity: 0.82;
+    transition: filter 0.3s var(--ease), opacity 0.3s var(--ease), transform 0.4s var(--ease);
+  }
+
+  .brand-tile:hover & img {
+    filter: none;
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+.brand-tile__word {
+  font-size: clamp(2rem, 3.6vw, 2.9rem);
+  font-weight: 800;
+  font-style: italic;
+  font-stretch: 70%;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  opacity: 0.85;
+  transition: opacity 0.3s;
+
+  .brand-tile:hover & {
+    opacity: 1;
+  }
+}
+
+.brand-tile__meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--c-ink-3);
+
+  @media (max-width: 480px) {
+    font-size: var(--fs-xs);
+    app-icon {
+      display: none;
+    }
+  }
+
+  app-icon {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 0.2s var(--ease);
+  }
+
+  .brand-tile:hover & {
+    color: var(--c-ink);
+    app-icon {
+      transform: translateX(3px);
+    }
+  }
+}
+
+/* =========================================================
+   KONTAKT
+   ========================================================= */
+.contact {
+  padding-top: 0;
+}
+
+.contact__grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: clamp(2.5rem, 6vw, 5rem);
+  align-items: start;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contact__info {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.contact__list {
+  display: grid;
+  margin-top: 0.5rem;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-block: 0.9rem;
+    border-bottom: 1px solid var(--c-line);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: var(--fs-md);
+
+    &:hover {
+      color: var(--c-orange-dark);
+    }
+  }
+
+  li:first-child a {
+    border-top: 1px solid var(--c-line);
+  }
+
+  app-icon {
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0.7rem;
+    border-radius: 50%;
+    background: var(--c-paper);
+  }
+
+  span {
+    display: grid;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  small {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--c-ink-3);
+  }
+}
+
+.contact__hours {
+  max-width: 380px;
+  margin-top: 0.5rem;
+}
+
+.contact__sub {
+  margin-bottom: 0.75rem;
+  font-size: var(--fs-md);
+  font-weight: 700;
+}
+
+.contact__form {
+  padding: clamp(1.5rem, 3.5vw, 2.75rem);
+  border-radius: var(--r-lg);
+  background: var(--c-paper);
+
+  .h-block {
+    margin-bottom: 1.5rem;
+  }
+
+  /* Mobitel: bijeli list od ruba do ruba – polja su šira, a tekst poravnat s ostatkom stranice */
+  @media (max-width: 600px) {
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    border-radius: 0;
+  }
+}

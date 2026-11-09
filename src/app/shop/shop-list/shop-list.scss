@@ -1,0 +1,413 @@
+.shop {
+  padding-block: clamp(1.5rem, 3vw, 2.5rem) var(--section);
+}
+
+.shop__grid {
+  display: grid;
+  grid-template-columns: 270px minmax(0, 1fr);
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  align-items: start;
+}
+
+/* ---------- Filteri ---------- */
+.filters {
+  position: sticky;
+  top: calc(var(--header-h) + 1rem);
+  display: grid;
+  gap: 0.75rem;
+  max-height: calc(100dvh - var(--header-h) - 2rem);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.filters__head {
+  display: none;
+}
+
+.block {
+  display: grid;
+  gap: 0.85rem;
+  padding-block: 1.25rem;
+
+  & + & {
+    border-top: 1px solid var(--c-line);
+  }
+  .filters__head + & {
+    padding-top: 0;
+  }
+}
+
+.block__title {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--c-ink-3);
+}
+
+.tree,
+.tree__children {
+  display: grid;
+  gap: 1px;
+}
+
+.tree__children {
+  margin: 0.15rem 0 0.35rem 0.75rem;
+  padding-left: 0.6rem;
+  border-left: 1px solid var(--c-line);
+}
+
+.tree__row {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.tree__link {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+  font-weight: 550;
+  color: var(--c-ink-2);
+  text-decoration: none;
+
+  &:hover {
+    background: var(--c-sand);
+    color: var(--c-ink);
+  }
+
+  &.is-active {
+    background: var(--c-ink);
+    color: #fff;
+    font-weight: 700;
+    .tree__count {
+      color: #c9c2b7;
+    }
+  }
+}
+
+.tree__count {
+  font-size: var(--fs-xs);
+  color: var(--c-ink-3);
+}
+
+.tree__toggle {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--c-ink-3);
+  flex: none;
+
+  app-icon {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 0.2s var(--ease);
+  }
+  &.is-open app-icon {
+    transform: rotate(180deg);
+  }
+  &:hover {
+    background: var(--c-sand);
+    color: var(--c-ink);
+  }
+}
+
+.price {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.price__field {
+  display: grid;
+  gap: 0.3rem;
+  label {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--c-ink-2);
+  }
+  .input {
+    min-height: 2.6rem;
+    padding: 0.5rem 0.7rem;
+  }
+}
+
+/* ---------- Alatna traka ---------- */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tsearch {
+  position: relative;
+  flex: 1 1 280px;
+
+  app-icon {
+    position: absolute;
+    left: 0.9rem;
+    top: 50%;
+    width: 1.1rem;
+    height: 1.1rem;
+    transform: translateY(-50%);
+    color: var(--c-ink-3);
+    pointer-events: none;
+  }
+  input {
+    width: 100%;
+    height: 3rem;
+    padding: 0 1rem 0 2.7rem;
+    border: 1.5px solid var(--c-line);
+    border-radius: var(--r-sm);
+    background: var(--c-paper);
+    &:focus {
+      outline: none;
+      border-color: var(--c-ink);
+      box-shadow: 0 0 0 3px rgba(27, 23, 20, 0.12);
+    }
+  }
+}
+
+.sort {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--c-ink-2);
+  .select {
+    width: auto;
+    min-width: 200px;
+  }
+}
+
+.filters-btn {
+  display: none;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  min-height: 2.5rem;
+  margin-block: 1rem 1.25rem;
+}
+
+.meta__count {
+  font-weight: 700;
+  font-size: var(--fs-sm);
+}
+
+.active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.afilter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.55rem 0.35rem 0.8rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--c-stone);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  app-icon {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+  &:hover {
+    background: var(--c-ink);
+    color: #fff;
+  }
+}
+
+.clear {
+  border: 0;
+  background: none;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--c-orange);
+  text-underline-offset: 4px;
+  &:hover {
+    color: var(--c-orange-dark);
+  }
+}
+
+/* ---------- Prazno stanje ---------- */
+.empty {
+  display: grid;
+  justify-items: start;
+  gap: 0.75rem;
+  padding: clamp(2rem, 5vw, 3.5rem);
+  border-radius: var(--r-lg);
+  background: var(--c-paper);
+  p {
+    max-width: 56ch;
+  }
+}
+
+.empty__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+/* ---------- Stranice ---------- */
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 2.5rem;
+}
+
+.pager__btn {
+  display: grid;
+  place-items: center;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  padding: 0 0.6rem;
+  border: 1.5px solid var(--c-line);
+  border-radius: var(--r-sm);
+  background: var(--c-paper);
+  font-weight: 700;
+  text-decoration: none;
+  app-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+  &:hover {
+    border-color: var(--c-ink);
+  }
+  &.is-active {
+    background: var(--c-ink);
+    border-color: var(--c-ink);
+    color: #fff;
+  }
+  &.is-disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}
+
+/* ---------- Mobilno: filteri kao ladica ---------- */
+.scrim {
+  display: none;
+}
+
+@media (max-width: 960px) {
+  .shop__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filters-btn {
+    display: inline-flex;
+  }
+
+  .filters {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 70;
+    width: min(360px, 88vw);
+    max-height: none;
+    padding: 1rem;
+    background: var(--c-sand);
+    transform: translateX(-105%);
+    visibility: hidden;
+    transition: transform 0.3s var(--ease), visibility 0.3s;
+    box-shadow: 20px 0 60px -20px rgba(0, 0, 0, 0.4);
+
+    &.is-open {
+      transform: none;
+      visibility: visible;
+    }
+  }
+
+  .filters__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.25rem;
+  }
+
+  .filters__title {
+    font-size: 2rem;
+    font-weight: 800;
+    font-stretch: 62%;
+    text-transform: uppercase;
+  }
+
+  .filters__close {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 0;
+    border-radius: var(--r-sm);
+    background: var(--c-paper);
+    app-icon {
+      width: 1.3rem;
+      height: 1.3rem;
+    }
+  }
+
+  .scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 65;
+    border: 0;
+    background: rgba(22, 18, 15, 0.55);
+    animation: fade 0.2s;
+  }
+
+  .sort .select {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .sort span {
+    display: none;
+  }
+  .sort,
+  .filters-btn {
+    flex: 1;
+  }
+  .sort .select {
+    width: 100%;
+  }
+}
+
+/* Najuži telefoni: manje unutarnjeg razmaka da "Preporučeno" stane cijelo */
+@media (max-width: 380px) {
+  .sort .select {
+    padding-inline: 0.75rem 2.1rem;
+    background-position: right 0.55rem center;
+  }
+  .filters-btn {
+    flex: 0 0 auto;
+    padding-inline: 1rem;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}

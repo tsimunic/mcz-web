@@ -1,0 +1,161 @@
+@if (product(); as p) {
+  <div class="container">
+    <nav class="crumbs" aria-label="Putanja">
+      <ol role="list">
+        <li><a routerLink="/">Naslovna</a></li>
+        <li><a routerLink="/trgovina">Trgovina</a></li>
+        @for (c of path(); track c.slug) {
+          <li><a [routerLink]="['/trgovina', c.slug]">{{ c.name }}</a></li>
+        }
+        <li><span aria-current="page">{{ p.name }}</span></li>
+      </ol>
+    </nav>
+
+    <div class="pd">
+      <!-- ============ Galerija ============ -->
+      <div class="gallery">
+        <div class="gallery__main">
+          @if (mainImage(); as img) {
+            <img [src]="img.full" [alt]="p.name" (error)="fallback($event, img.thumb)" width="900" height="900" />
+          } @else {
+            <span class="gallery__placeholder">MCZ</span>
+          }
+          @if (p.badge) {
+            <span class="badge">{{ p.badge }}</span>
+          }
+        </div>
+        @if (p.images.length > 1) {
+          <div class="gallery__thumbs" role="group" aria-label="Odaberi sliku">
+            @for (src of p.images; track src; let i = $index) {
+              <button type="button" class="thumb" [attr.aria-pressed]="i === activeImage()" (click)="activeImage.set(i)" [attr.aria-label]="'Slika ' + (i + 1)">
+                <img [src]="src" alt="" width="96" height="96" loading="lazy" />
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- ============ Info ============ -->
+      <div class="info">
+        @if (p.brand) {
+          <p class="info__brand">{{ p.brand }}</p>
+        }
+        <h1 class="info__title">{{ p.name }}</h1>
+
+        <div class="info__price">
+          <p class="price tnum">{{ p.price | eur }}</p>
+          @if (p.oldPrice) {
+            <s class="old tnum">{{ p.oldPrice | eur }}</s>
+          }
+        </div>
+
+        <p [class]="'stock stock--' + p.availability">{{ labels[p.availability] }}</p>
+
+        @if (p.description) {
+          <p class="info__summary">{{ p.description }}</p>
+        }
+
+        <div class="buy">
+          @if (p.availability === 'in-stock') {
+            <div class="qty" role="group" aria-label="Količina">
+              <button type="button" (click)="step(-1)" [disabled]="qty() <= 1" aria-label="Smanji količinu"><app-icon name="minus" /></button>
+              <input type="number" min="1" max="99" inputmode="numeric" [value]="qty()" (change)="setQty($any($event.target).value)" aria-label="Količina" class="tnum" />
+              <button type="button" (click)="step(1)" aria-label="Povećaj količinu"><app-icon name="plus" /></button>
+            </div>
+            <button type="button" class="btn btn--primary btn--lg buy__btn" (click)="addToCart()">
+              <app-icon name="cart" />Dodaj u košaricu
+            </button>
+          } @else {
+            <a class="btn btn--primary btn--lg buy__btn" routerLink="/kontakt" [queryParams]="{ upit: p.name }">Pošalji upit za ovaj model</a>
+            <a class="btn btn--outline btn--lg" [href]="site.phoneHref"><app-icon name="phone" />{{ site.phone }}</a>
+          }
+        </div>
+
+        @if (inCart() > 0) {
+          <p class="in-cart">
+            <app-icon name="check" />U košarici: {{ inCart() }} kom.
+            <a routerLink="/kosarica" class="link">Otvori košaricu</a>
+          </p>
+        }
+
+        <ul class="assure" role="list">
+          <li><app-icon name="wrench" /><span>Servis i rezervni dijelovi u Bedekovčini</span></li>
+          <li><app-icon name="truck" /><span>Osobno preuzimanje ili dostava na adresu</span></li>
+          <li><app-icon name="phone" /><span>Pitanja? Nazovite <a [href]="site.phoneHref">{{ site.phone }}</a></span></li>
+        </ul>
+
+        <dl class="meta">
+          @if (p.sku) {
+            <div><dt>Šifra</dt><dd>{{ p.sku }}</dd></div>
+          }
+          <div>
+            <dt>Kategorija</dt>
+            <dd>
+              @for (c of path(); track c.slug; let last = $last) {
+                <a [routerLink]="['/trgovina', c.slug]">{{ c.name }}</a>{{ last ? '' : ', ' }}
+              }
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <!-- ============ Opis / specifikacije ============ -->
+    @if (p.description || p.specs?.length) {
+      <section class="details">
+        <div class="tabs" role="tablist" aria-label="Detalji proizvoda">
+          @if (p.description) {
+            <button type="button" role="tab" id="tab-opis" aria-controls="panel-opis" [attr.aria-selected]="tab() === 'opis'" (click)="tab.set('opis')">Opis</button>
+          }
+          @if (p.specs?.length) {
+            <button type="button" role="tab" id="tab-spec" aria-controls="panel-spec" [attr.aria-selected]="tab() === 'spec'" (click)="tab.set('spec')">Specifikacije</button>
+          }
+        </div>
+        @if (tab() === 'opis' && p.description) {
+          <div class="panel prose" role="tabpanel" id="panel-opis" aria-labelledby="tab-opis">
+            <p>{{ p.description }}</p>
+            <p class="muted">Slika je simbolična.</p>
+          </div>
+        }
+        @if (tab() === 'spec' && p.specs?.length) {
+          <div class="panel" role="tabpanel" id="panel-spec" aria-labelledby="tab-spec">
+            <table class="specs">
+              <caption class="sr-only">Tehničke specifikacije: {{ p.name }}</caption>
+              <tbody>
+                @for (s of p.specs; track s.label) {
+                  <tr>
+                    <th scope="row">{{ s.label }}</th>
+                    <td>{{ s.value }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    }
+
+    <!-- ============ Povezano ============ -->
+    @if (related().length) {
+      <section class="related">
+        <h2 class="h-section">Povezani proizvodi</h2>
+        <div class="product-grid">
+          @for (r of related(); track r.id) {
+            <app-product-card [product]="r" />
+          }
+        </div>
+      </section>
+    }
+  </div>
+} @else {
+  <section class="missing on-dark">
+    <div class="container">
+      <h1 class="h-section">Proizvod nije pronađen</h1>
+      <p class="lead">Moguće je da je rasprodan ili premješten. Pogledajte trenutnu ponudu ili nas pitajte za dostupnost.</p>
+      <div class="missing__actions">
+        <a class="btn btn--primary btn--lg" routerLink="/trgovina">U trgovinu</a>
+        <a class="btn btn--ghost btn--lg" routerLink="/kontakt">Pošalji upit</a>
+      </div>
+    </div>
+  </section>
+}

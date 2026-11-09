@@ -1,0 +1,74 @@
+<div class="util on-dark">
+  <div class="container util__inner">
+    <div class="util__contact">
+      <a [href]="site.phoneHref"><app-icon name="phone" />{{ site.phone }}</a>
+      <a [href]="'mailto:' + site.email" class="util__mail"><app-icon name="mail" />{{ site.email }}</a>
+    </div>
+    <p class="util__status" [class.is-open]="status().open">
+      <span class="dot" aria-hidden="true"></span>{{ status().label }}
+    </p>
+    <div class="util__social">
+      <a [href]="site.social.facebook" target="_blank" rel="noopener" aria-label="Facebook"><app-icon name="facebook" /></a>
+      <a [href]="site.social.instagram" target="_blank" rel="noopener" aria-label="Instagram"><app-icon name="instagram" /></a>
+      <a [href]="site.social.youtube" target="_blank" rel="noopener" aria-label="YouTube"><app-icon name="youtube" /></a>
+    </div>
+  </div>
+</div>
+
+<header class="bar" [class.is-scrolled]="scrolled()" [class.is-open]="menuOpen()">
+  <div class="container bar__inner">
+    <a routerLink="/" class="brand" aria-label="Moto Centar Zagorje, naslovna">
+      <img [src]="site.logo" alt="" width="52" height="52" />
+      <span class="brand__name">Moto Centar<br />Zagorje</span>
+    </a>
+
+    <nav class="nav" aria-label="Glavna navigacija">
+      @for (item of nav; track item.path) {
+        <a [routerLink]="item.path" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: item.exact }" ariaCurrentWhenActive="page">{{ item.label }}</a>
+      }
+    </nav>
+
+    <form class="search" role="search" (submit)="search($event, q)">
+      <app-icon name="search" />
+      <input #q type="search" name="q" placeholder="Traži vozila i dijelove" aria-label="Traži vozila i dijelove" />
+    </form>
+
+    <a routerLink="/kosarica" class="cart" [attr.aria-label]="'Košarica: ' + cart.count() + ' kom, ' + (cart.subtotal() | eur)">
+      <span class="cart__icon">
+        <app-icon name="cart" />
+        @if (cart.count() > 0) {
+          <span class="cart__count tnum">{{ cart.count() }}</span>
+        }
+      </span>
+      <span class="cart__text">
+        <span class="cart__label">Košarica</span>
+        <span class="cart__total tnum">{{ cart.subtotal() | eur }}</span>
+      </span>
+    </a>
+
+    <button type="button" class="menu-btn" (click)="menuOpen.set(!menuOpen())" [attr.aria-expanded]="menuOpen()" aria-controls="mobilni-izbornik">
+      <app-icon [name]="menuOpen() ? 'close' : 'menu'" />
+      <span class="sr-only">Izbornik</span>
+    </button>
+  </div>
+
+  @if (menuOpen()) {
+    <div class="mobile" id="mobilni-izbornik">
+      <div class="container">
+        <form class="search search--mobile" role="search" (submit)="search($event, mq)">
+          <app-icon name="search" />
+          <input #mq type="search" name="q" placeholder="Traži vozila i dijelove" aria-label="Traži vozila i dijelove" />
+        </form>
+        <nav aria-label="Mobilna navigacija">
+          @for (item of nav; track item.path) {
+            <a [routerLink]="item.path" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: item.exact }">{{ item.label }}</a>
+          }
+        </nav>
+        <div class="mobile__contact">
+          <a class="btn btn--primary btn--block" [href]="site.phoneHref"><app-icon name="phone" />Nazovi {{ site.phone }}</a>
+          <p class="mobile__status">{{ status().label }}</p>
+        </div>
+      </div>
+    </div>
+  }
+</header>

@@ -1,0 +1,219 @@
+<!-- ================= HERO ================= -->
+<section class="hero on-dark" aria-label="Istaknuto">
+  @for (s of slides; track s.id; let i = $index) {
+    <img
+      class="hero__img"
+      [class.is-active]="i === active()"
+      [src]="s.image"
+      alt=""
+      [style.object-position]="s.focus"
+      [style.transform-origin]="s.focus"
+      [attr.fetchpriority]="i === 0 ? 'high' : null"
+      [attr.loading]="i === 0 ? 'eager' : 'lazy'"
+    />
+  }
+  <div class="hero__shade"></div>
+  <app-contours class="hero__contours" [hills]="heroHills" />
+
+  <div class="container hero__inner">
+    @for (s of current(); track s.id) {
+      <div class="hero__content" role="tabpanel" [id]="'slide-' + s.id" [attr.aria-labelledby]="'tab-' + s.id">
+        <h1 class="hero__title display">{{ s.title }}</h1>
+        <p class="hero__text">{{ s.text }}</p>
+        <div class="hero__actions">
+          @if (s.primary.link) {
+            <a class="btn btn--primary btn--lg" [routerLink]="s.primary.link">{{ s.primary.label }}</a>
+          } @else {
+            <a class="btn btn--primary btn--lg" [href]="s.primary.href" target="_blank" rel="noopener">
+              <app-icon name="play" />{{ s.primary.label }}
+            </a>
+          }
+          @if (s.price) {
+            <p class="hero__price"><span>Cijena</span><b class="tnum">{{ s.price | eur }}</b></p>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="hero__tabs" role="tablist" aria-label="Odaberi istaknuti sadržaj">
+      @for (s of slides; track s.id; let i = $index) {
+        <button
+          type="button"
+          role="tab"
+          class="hero__tab"
+          [id]="'tab-' + s.id"
+          [attr.aria-selected]="i === active()"
+          [attr.aria-controls]="'slide-' + s.id"
+          [attr.tabindex]="i === active() ? 0 : -1"
+          (click)="select(i)"
+          (keydown)="onTabKey($event)"
+        >
+          <img [src]="s.image" alt="" width="72" height="48" loading="lazy" />
+          <span>{{ s.tab }}</span>
+        </button>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ================= PREDNOSTI ================= -->
+<section class="perks" aria-label="Zašto kupiti kod nas">
+  <ul class="container perks__list" role="list">
+    <li><app-icon name="shield" /><span><b>Sigurna kupovina</b>Jasne cijene i uvjeti kupnje</span></li>
+    <li><app-icon name="award" /><span><b>Dugogodišnje iskustvo</b>S ATV, UTV vozilima i motociklima</span></li>
+    <li><app-icon name="truck" /><span><b>Brza i pouzdana dostava</b>Dijelova i opreme na vašu adresu</span></li>
+    <li><app-icon name="wrench" /><span><b>Vlastiti servis</b>Održavanje i rezervni dijelovi</span></li>
+  </ul>
+</section>
+
+<!-- ================= PONUDA ================= -->
+<section class="section offer">
+  <div class="container">
+    <div class="head">
+      <h2 class="h-section">Što vas vozi?</h2>
+      <p class="lead">ATV i UTV vozila za rad i rekreaciju, motocikli za prve i ozbiljne vožnje te servis kitovi za sve koji vole sami održavati svoje vozilo.</p>
+    </div>
+
+    <div class="tiles">
+      <article class="tile tile--big">
+        <img [src]="img + '2025/08/MCZ_web-378.webp'" alt="Dva ATV-a na livadi" loading="lazy" />
+        <div class="tile__body">
+          <h3 class="tile__title"><a routerLink="/trgovina/vozila" class="tile__link">ATV i UTV</a></h3>
+          <p class="tile__text">Najbolja ATV ponuda</p>
+          <ul class="tile__brands" role="list">
+            @for (b of brandChips(); track b.slug) {
+              @if (b.slug !== 'kayo') {
+                <li><a [routerLink]="['/trgovina', b.slug]">{{ b.name }}</a></li>
+              }
+            }
+          </ul>
+        </div>
+      </article>
+
+      <article class="tile">
+        <img [src]="img + '2025/09/srt800.webp'" alt="Motociklist na makadamu" loading="lazy" />
+        <div class="tile__body">
+          <h3 class="tile__title"><a routerLink="/trgovina/kayo" class="tile__link">Motocikli</a></h3>
+          <p class="tile__text">2 kotača manje, 2 puta više zabave</p>
+        </div>
+      </article>
+
+      <article class="tile">
+        <img [src]="img + '2025/09/serviskit.webp'" alt="Kutija servis kita na radnom stolu" loading="lazy" />
+        <div class="tile__body">
+          <h3 class="tile__title"><a routerLink="/trgovina/service-kit" class="tile__link">Servis kitovi</a></h3>
+          <p class="tile__text">Sam svoj majstor</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= IZDVOJENO ================= -->
+<section class="section featured">
+  <div class="container">
+    <div class="head head--row">
+      <h2 class="h-section">Izdvojeno iz ponude</h2>
+      <div class="chips" role="group" aria-label="Prikaži po brendu">
+        <button type="button" class="chip" [attr.aria-pressed]="brandFilter() === 'sve'" (click)="brandFilter.set('sve')">Svi brendovi</button>
+        @for (b of brandChips(); track b.slug) {
+          <button type="button" class="chip" [attr.aria-pressed]="brandFilter() === b.slug" (click)="brandFilter.set(b.slug)">{{ b.name }}</button>
+        }
+      </div>
+    </div>
+
+    <div class="product-grid">
+      @for (p of featured(); track p.id) {
+        <app-product-card [product]="p" />
+      }
+    </div>
+
+    <div class="featured__more">
+      <a class="btn btn--dark btn--lg" routerLink="/trgovina/vozila">Pogledaj sva vozila ({{ vehicleCount() }})</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SERVIS ================= -->
+<section class="band on-dark">
+  <app-contours [hills]="bandHills" />
+  <div class="container band__inner">
+    <div class="band__intro">
+      <h2 class="h-section">Servis i rezervni dijelovi</h2>
+      <p class="lead">Servisiramo ATV, UTV vozila i motocikle. U trgovini su rezervni dijelovi za Linhai, Segway, TGB, CF Moto i Polaris te servis kitovi za najčešće modele.</p>
+      <div class="band__actions">
+        <a class="btn btn--primary btn--lg" routerLink="/servis">Naruči servis</a>
+        <a class="btn btn--ghost btn--lg" routerLink="/trgovina/dijelovi">Rezervni dijelovi</a>
+      </div>
+    </div>
+    <ol class="steps" role="list">
+      @for (s of serviceSteps; track s.title; let i = $index) {
+        <li class="step">
+          <span class="step__num tnum" aria-hidden="true">{{ i + 1 }}</span>
+          <div>
+            <h3 class="step__title">{{ s.title }}</h3>
+            <p class="step__text">{{ s.text }}</p>
+          </div>
+        </li>
+      }
+    </ol>
+  </div>
+</section>
+
+<!-- ================= BRENDOVI ================= -->
+<section class="section brands">
+  <div class="container">
+    <div class="head head--row">
+      <h2 class="h-section">Brendovi</h2>
+      <p class="lead">U ponudi su vozila pet proizvođača. Odaberite brend i pogledajte sve modele.</p>
+    </div>
+    <ul class="brand-grid" role="list">
+      @for (b of brands(); track b.slug) {
+        <li>
+          <a [routerLink]="['/trgovina', b.slug]" class="brand-tile">
+            <span class="brand-tile__mark">
+              @if (b.logo) {
+                <img [src]="b.logo" [alt]="b.name" width="300" height="300" loading="lazy" />
+              } @else {
+                <span class="brand-tile__word">{{ b.name }}</span>
+              }
+            </span>
+            <span class="brand-tile__meta">
+              <span class="tnum">{{ b.label }}</span>
+              <app-icon name="chevron-right" />
+            </span>
+          </a>
+        </li>
+      }
+    </ul>
+  </div>
+</section>
+
+<!-- ================= KONTAKT ================= -->
+<section class="section contact" id="kontakt">
+  <div class="container contact__grid">
+    <div class="contact__info">
+      <h2 class="h-section">Kontaktirajte nas</h2>
+      <p class="lead">Imate upit ili trebate informacije? Pošaljite poruku, nazovite ili pišite na e-mail.</p>
+      <ul class="contact__list" role="list">
+        <li>
+          <a [href]="site.phoneHref"><app-icon name="phone" /><span><small>Telefon</small>{{ site.phone }}</span></a>
+        </li>
+        <li>
+          <a [href]="'mailto:' + site.email"><app-icon name="mail" /><span><small>E-mail</small>{{ site.email }}</span></a>
+        </li>
+        <li>
+          <a [href]="site.mapsLink" target="_blank" rel="noopener"><app-icon name="pin" /><span><small>Adresa</small>{{ site.street }}, {{ site.city }}</span></a>
+        </li>
+      </ul>
+      <div class="contact__hours">
+        <h3 class="contact__sub">Radno vrijeme</h3>
+        <app-hours />
+      </div>
+    </div>
+    <div class="contact__form">
+      <h3 class="h-block">Pošaljite upit</h3>
+      <app-contact-form />
+    </div>
+  </div>
+</section>
