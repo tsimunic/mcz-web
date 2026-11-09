@@ -43,6 +43,10 @@
   --fs-md: 1.125rem;
   --fs-lg: 1.375rem;
   --fs-xl: 1.75rem;
+  /* Stavke u popisima (usluge, koraci…): naslov 18 px na mobitelu → 22 px na desktopu,
+     opis 15 px → 16 px. Ista mjera na svim stranicama. */
+  --fs-item: clamp(1.125rem, 0.95rem + 0.6vw, 1.375rem);
+  --fs-item-text: clamp(0.9375rem, 0.9rem + 0.2vw, 1rem);
   --fs-2xl: clamp(2rem, 4vw, 2.75rem);
   --fs-section: clamp(2.75rem, 6.5vw, 5rem);
   --fs-hero: clamp(4rem, 11.5vw, 11rem);
@@ -69,6 +73,8 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-padding-top: calc(var(--header-h) + 16px);
+  /* PRAVILO (AGENTS.md): bez plavog/sivog bljeska preglednika pri dodiru na mobitelu */
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -107,8 +113,8 @@ dd {
   margin: 0;
 }
 
-ul[role='list'],
-ol[role='list'] {
+/* :where() = nulta specifičnost, pa klase poput .container (rub od ruba ekrana) uvijek pobijede reset */
+:where(ul[role='list'], ol[role='list']) {
   list-style: none;
   padding: 0;
 }
@@ -129,6 +135,32 @@ textarea {
 
 button {
   cursor: pointer;
+}
+
+/* ---------- Dodir i pritisak ----------
+   PRAVILO (AGENTS.md): zadani efekt dodira preglednika je ugašen, pa svaki klikabilni element mora
+   imati vlastiti, diskretni odziv na pritisak. Fokus s tipkovnice (:focus-visible) ostaje vidljiv. */
+a,
+button,
+input,
+select,
+textarea,
+label,
+summary,
+[role='button'],
+[role='tab'],
+[tabindex] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled):not([aria-disabled='true']):active,
+[role='button']:not([aria-disabled='true']):active,
+.btn:not(:disabled):not([aria-disabled='true']):active {
+  transform: scale(0.97);
+}
+
+a:not(.btn):active {
+  opacity: 0.7;
 }
 
 :focus-visible {

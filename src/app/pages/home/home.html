@@ -1,11 +1,27 @@
 <!-- ================= HERO ================= -->
-<section class="hero on-dark" aria-label="Istaknuto">
+<!-- Prst/miš: povlačenje lijevo-desno; touchpad: vodoravni pokret; tipkovnica: strelice na karticama -->
+<section
+  #hero
+  class="hero on-dark"
+  aria-label="Istaknuto"
+  aria-roledescription="vrtuljak"
+  [class.is-playing]="playing()"
+  [class.is-paused]="paused()"
+  [class.is-dragging]="dragging()"
+  (pointerdown)="onPointerDown($event)"
+  (pointermove)="onPointerMove($event)"
+  (pointerup)="onPointerUp($event)"
+  (pointercancel)="onPointerCancel()"
+  (wheel)="onWheel($event)"
+  (dragstart)="$event.preventDefault()"
+>
   @for (s of slides; track s.id; let i = $index) {
     <img
       class="hero__img"
       [class.is-active]="i === active()"
       [src]="s.image"
       alt=""
+      draggable="false"
       [style.object-position]="s.focus"
       [style.transform-origin]="s.focus"
       [attr.fetchpriority]="i === 0 ? 'high' : null"
@@ -16,42 +32,71 @@
   <app-contours class="hero__contours" [hills]="heroHills" />
 
   <div class="container hero__inner">
-    @for (s of current(); track s.id) {
-      <div class="hero__content" role="tabpanel" [id]="'slide-' + s.id" [attr.aria-labelledby]="'tab-' + s.id">
-        <h1 class="hero__title display">{{ s.title }}</h1>
-        <p class="hero__text">{{ s.text }}</p>
-        <div class="hero__actions">
-          @if (s.primary.link) {
-            <a class="btn btn--primary btn--lg" [routerLink]="s.primary.link">{{ s.primary.label }}</a>
-          } @else {
-            <a class="btn btn--primary btn--lg" [href]="s.primary.href" target="_blank" rel="noopener">
-              <app-icon name="play" />{{ s.primary.label }}
-            </a>
-          }
-          @if (s.price) {
-            <p class="hero__price"><span>Cijena</span><b class="tnum">{{ s.price | eur }}</b></p>
-          }
+    <!-- Dok se slajdovi sami mijenjaju, čitač ekrana ih ne najavljuje (aria-live off) -->
+    <div
+      class="hero__stage"
+      [attr.aria-live]="playing() ? 'off' : 'polite'"
+      [style.transform]="stageTransform()"
+      [style.opacity]="stageOpacity()"
+    >
+      @for (s of current(); track s.id) {
+        <div class="hero__content" role="tabpanel" [id]="'slide-' + s.id" [attr.aria-labelledby]="'tab-' + s.id">
+          <h1 class="hero__title display">{{ s.title }}</h1>
+          <p class="hero__text">{{ s.text }}</p>
+          <div class="hero__actions">
+            @if (s.primary.link) {
+              <a class="btn btn--primary btn--lg" [routerLink]="s.primary.link" draggable="false">{{ s.primary.label }}</a>
+            } @else {
+              <a class="btn btn--primary btn--lg" [href]="s.primary.href" target="_blank" rel="noopener" draggable="false">
+                <app-icon name="play" />{{ s.primary.label }}
+              </a>
+            }
+            @if (s.price) {
+              <p class="hero__price"><span>Cijena</span><b class="tnum">{{ s.price | eur }}</b></p>
+            }
+          </div>
         </div>
-      </div>
-    }
+      }
+    </div>
 
-    <div class="hero__tabs" role="tablist" aria-label="Odaberi istaknuti sadržaj">
-      @for (s of slides; track s.id; let i = $index) {
+    <div class="hero__nav">
+      <div class="hero__tabs" role="tablist" aria-label="Odaberi istaknuti sadržaj">
+        @for (s of slides; track s.id; let i = $index) {
+          <button
+            type="button"
+            role="tab"
+            class="hero__tab"
+            [id]="'tab-' + s.id"
+            [attr.aria-selected]="i === active()"
+            [attr.aria-controls]="'slide-' + s.id"
+            [attr.tabindex]="i === active() ? 0 : -1"
+            (click)="select(i)"
+            (keydown)="onTabKey($event)"
+          >
+            <!-- traka: puna na aktivnoj kartici; dok traje automatska izmjena, puni se kao mjerač -->
+            <span class="hero__bar" aria-hidden="true" (animationend)="onBarEnd($event)"></span>
+            <img [src]="s.image" alt="" width="72" height="48" loading="lazy" draggable="false" />
+            <span class="hero__tab-label">{{ s.tab }}</span>
+          </button>
+        }
+      </div>
+
+      <div class="hero__controls">
         <button
           type="button"
-          role="tab"
-          class="hero__tab"
-          [id]="'tab-' + s.id"
-          [attr.aria-selected]="i === active()"
-          [attr.aria-controls]="'slide-' + s.id"
-          [attr.tabindex]="i === active() ? 0 : -1"
-          (click)="select(i)"
-          (keydown)="onTabKey($event)"
+          class="hero__ctrl"
+          (click)="toggleAutoplay()"
+          [attr.aria-label]="playing() ? 'Zaustavi automatsku izmjenu' : 'Pokreni automatsku izmjenu'"
         >
-          <img [src]="s.image" alt="" width="72" height="48" loading="lazy" />
-          <span>{{ s.tab }}</span>
+          <app-icon [name]="playing() ? 'pause' : 'play'" />
         </button>
-      }
+        <button type="button" class="hero__ctrl hero__ctrl--arrow" (click)="prev()" aria-label="Prethodni slajd">
+          <app-icon name="chevron-left" />
+        </button>
+        <button type="button" class="hero__ctrl hero__ctrl--arrow" (click)="next()" aria-label="Sljedeći slajd">
+          <app-icon name="chevron-right" />
+        </button>
+      </div>
     </div>
   </div>
 </section>

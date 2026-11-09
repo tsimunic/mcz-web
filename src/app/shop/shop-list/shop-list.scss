@@ -374,6 +374,11 @@
     border: 0;
     background: rgba(22, 18, 15, 0.55);
     animation: fade 0.2s;
+
+    /* pozadina preko cijelog ekrana se na pritisak ne smanjuje (globalni scale gumba) */
+    &:active {
+      transform: none;
+    }
   }
 
   .sort .select {

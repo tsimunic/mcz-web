@@ -2,6 +2,8 @@
    HERO
    ========================================================= */
 .hero {
+  /* Trajanje jednog slajda pri automatskoj izmjeni */
+  --hero-delay: 7s;
   position: relative;
   isolation: isolate;
   display: grid;
@@ -9,6 +11,26 @@
   min-height: min(calc(100svh - var(--header-h) - 2.4rem), 860px);
   overflow: hidden;
   background: var(--c-coal);
+  /* okomito skrolanje ostaje pregledniku, vodoravni pokret prstom mijenja slajd */
+  touch-action: pan-y;
+
+  &.is-dragging {
+    cursor: grabbing;
+    user-select: none;
+  }
+  img {
+    -webkit-user-drag: none;
+  }
+}
+
+.hero__stage {
+  transition:
+    transform 0.35s var(--ease),
+    opacity 0.35s var(--ease);
+
+  .is-dragging & {
+    transition: none;
+  }
 }
 
 .hero__img {
@@ -120,12 +142,19 @@
   }
 }
 
+.hero__nav {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
 .hero__tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  min-width: 0;
 }
 
 .hero__tab {
@@ -151,19 +180,6 @@
     transition: opacity 0.15s;
   }
 
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: calc(-1rem - 1px);
-    height: 3px;
-    background: var(--c-orange);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s var(--ease);
-  }
-
   &:hover {
     color: #fff;
     img {
@@ -177,9 +193,88 @@
     img {
       opacity: 1;
     }
-    &::before {
-      transform: scaleX(1);
+  }
+}
+
+/* Narančasta traka iznad aktivne kartice. Dok traje automatska izmjena puni se kao mjerač
+   vremena; kad se napuni (animationend), prelazi se na sljedeći slajd. */
+.hero__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(-1rem - 1px);
+  height: 3px;
+  background: var(--c-orange);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s var(--ease);
+  pointer-events: none;
+
+  [aria-selected='true'] > & {
+    transform: scaleX(1);
+  }
+  .is-playing [aria-selected='true'] > & {
+    animation: hero-progress var(--hero-delay) linear both;
+  }
+  /* stani: prst/miš na banneru, banner izvan ekrana, kartica u pozadini, fokus s tipkovnice */
+  .is-paused &,
+  .hero:has(:focus-visible) & {
+    animation-play-state: paused;
+  }
+  /* stani dok je miš na karticama, strelicama ili gumbima (samo uređaji s mišem) */
+  @media (hover: hover) {
+    .hero:has(.hero__nav:hover, .hero__actions:hover) & {
+      animation-play-state: paused;
     }
+  }
+  /* mjerač je odbrojavanje, ne ukras – ako ga korisnik sam pokrene, mora trajati puno vrijeme */
+  @media (prefers-reduced-motion: reduce) {
+    .is-playing [aria-selected='true'] > & {
+      animation-duration: var(--hero-delay) !important;
+    }
+  }
+}
+
+@keyframes hero-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.hero__controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+  align-self: center;
+}
+
+.hero__ctrl {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+  background: rgba(22, 18, 15, 0.35);
+  color: #fff;
+  backdrop-filter: blur(4px);
+  transition:
+    background-color 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+
+  app-icon {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+  &:hover {
+    background: #fff;
+    border-color: #fff;
+    color: var(--c-ink);
   }
 }
 
@@ -190,7 +285,15 @@
   .hero__shade {
     background: linear-gradient(0deg, rgba(22, 18, 15, 0.96) 0%, rgba(22, 18, 15, 0.7) 50%, rgba(22, 18, 15, 0.15) 100%);
   }
-  /* Na mobitelu kartice postaju segmentirani prekidač: bez sličica, naziv u jednom redu */
+  /* Na mobitelu kartice postaju segmentirani prekidač: bez sličica, naziv u jednom redu.
+     Strelica nema – slajd se mijenja povlačenjem prsta; gumb za pauzu ostaje. */
+  .hero__nav {
+    gap: 0.5rem;
+  }
+  .hero__tabs {
+    flex: 1;
+    flex-wrap: nowrap;
+  }
   .hero__tab {
     flex: 1 1 0;
     min-width: 0;
@@ -201,11 +304,14 @@
     img {
       display: none;
     }
-    span {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+  }
+  .hero__tab-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .hero__ctrl--arrow {
+    display: none;
   }
 }
 
@@ -278,15 +384,24 @@
   }
 }
 
+/* Mobitel: popis s ikonom u blagom krugu, poravnat s rubom stranice (20 px) kao i ostatak sadržaja */
 @media (max-width: 560px) {
   .perks__list {
     grid-template-columns: 1fr;
     li {
-      padding: 1rem 0;
+      gap: 1rem;
+      padding: 0.9rem 0;
       & + li {
         border-left: 0;
         border-top: 1px solid var(--c-line);
       }
+    }
+    app-icon {
+      width: 2.75rem;
+      height: 2.75rem;
+      padding: 0.65rem;
+      border-radius: 50%;
+      background: var(--c-sand);
     }
   }
 }
@@ -583,7 +698,7 @@
 }
 
 .step__title {
-  font-size: var(--fs-lg);
+  font-size: var(--fs-item);
   font-weight: 700;
   font-stretch: 85%;
   line-height: 1.2;
@@ -591,6 +706,8 @@
 
 .step__text {
   margin-top: 0.25rem;
+  font-size: var(--fs-item-text);
+  line-height: 1.55;
   color: var(--c-mist);
 }
 
